@@ -1,20 +1,33 @@
-import express, { Application } from "express";
-import { Response,Request } from "express";
-import './database/db'
-import 'dotenv/config'
-const app : Application = express()
+import express, { Application, Request, Response } from 'express';
+import { userRoute } from './routes/user.route';
+import './database/db';
+import 'dotenv/config';
+import cors from 'cors';
 
-app.get('/',(req:Request, res:Response)=>{
-    res.send('hello world')
-})
+const app: Application = express();
 
+// Allowed origins for CORS
+const allowedOrigins = ['http://localhost:4200'];
+const options: cors.CorsOptions = {
+    origin: allowedOrigins,
+    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+};
 
-app.use(express.json)
-app.use(express.urlencoded({extended:true}))
+// Middleware setup
+app.use(cors(options));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// Test route to verify server is running
+app.get('/', (req: Request, res: Response) => {
+    res.send('Hello world');
+});
 
-app.listen(
-    process.env.PORT,
-    ()=>console.log(`app is listen in http://localhost:${process.env.PORT}`)
+// User routes
+app.use('/api/users', userRoute);
 
-)
+// Start server
+const port = process.env.PORT || 4001;
+app.listen(port, () => {
+    console.log(`App is listening on http://localhost:${port}`);
+});
